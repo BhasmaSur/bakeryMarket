@@ -1,9 +1,13 @@
-'use client'
-import React from 'react'
+"use client";
+import Dashboard from "@/app/pages/dashboard/page";
+import React from "react";
 
+const Page = ({ params }) => {
+  return (
+    <>
+      <Dashboard bakeryName={params.bakeryHome}/>
+    </>
+  );
+};
 
-const Page = ({params}) => {
-  return <p>Post: {params.bakeryHome}</p>
-}
-
-export default Page
+export default Page;
