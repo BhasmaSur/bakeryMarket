@@ -2,20 +2,20 @@ import React from 'react'
 
 import PropTypes from 'prop-types'
 
-const ServicesCard = (props) => {
+const ServicesCard = ({imageAlt, imageSrc, text, text1, text2}) => {
   return (
     <>
       <div className="services-card">
         <div className="services-card-container">
           <img
-            alt={props.imageAlt}
-            src={props.imageSrc}
+            alt={imageAlt}
+            src={imageSrc}
             className="services-card-image"
           />
         </div>
-        <span className="services-card-text">{props.text}</span>
-        <span className="services-card-text1">{props.text1}</span>
-        <span className="services-card-text2">{props.text2}</span>
+        <span className="services-card-text">{text}</span>
+        <span className="services-card-text1">{text1}</span>
+        <span className="services-card-text2">{text2}</span>
       </div>
       <style jsx>
         {`
