@@ -11,7 +11,7 @@ const httpService = (
   stream = false,
   additionalConfig = {}
 ) => {
-  let BASE_URL = "https://page-market.vercel.app/api"; //provide url
+  let BASE_URL = "https://bakery-market.vercel.app/api"; //provide url
   // let BASE_URL = "http://localhost:3000/api";
   const config = {
     headers: {
