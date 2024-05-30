@@ -1,4 +1,7 @@
 export async function GET() {
-    console.log("all bakery");
+  return NextResponse.json(
+    { error: "Internal Server Error" },
+    { status: 500 }
+  );
   }
   
