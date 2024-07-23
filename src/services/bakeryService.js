@@ -1,6 +1,14 @@
-import { collection, getDocs, query, where } from "firebase/firestore";
+import {
+  collection,
+  getDocs,
+  query,
+  where,
+  doc,
+  setDoc,
+} from "firebase/firestore";
 import { db } from "./firebaseService";
 import { COLLECTION } from "@/constants/databaseConstants";
+import { milletsAndMoreData } from "@/utility/demoDataUtil";
 
 const getBakeryData = async (bakeryName) => {
   let bakeryDetails = [];
@@ -15,4 +23,17 @@ const getBakeryData = async (bakeryName) => {
   return bakeryDetails.at(0);
 };
 
-export { getBakeryData };
+const updateProducts = async (request) => {
+  const { bakeryName, payload } = request;
+  try {
+    await setDoc(doc(db, COLLECTION.BAKERY_PROFILE_DOC, bakeryName), {
+      ...milletsAndMoreData,
+      products: payload,
+    });
+    return true;
+  } catch (e) {
+    return false;
+  }
+};
+
+export { getBakeryData, updateProducts };
