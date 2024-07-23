@@ -1,21 +1,35 @@
-import React from 'react'
+import React from "react";
 
-import PropTypes from 'prop-types'
+import PropTypes from "prop-types";
+import Link from "next/link";
 
 const NavigationLinks = (props) => {
+  const { scrollToSection } = props;
   return (
     <>
       <nav className={`navigation-links-nav ${props.rootClassName} `}>
-        <span className="navigation-links-text Navigation-Link">
+        <span
+          onClick={() => scrollToSection(1)}
+          className="navigation-links-text Navigation-Link"
+        >
           {props.link1}
         </span>
-        <span className="navigation-links-text1 Navigation-Link">
+        <span
+          onClick={() => scrollToSection(2)}
+          className="navigation-links-text1 Navigation-Link"
+        >
           {props.link2}
         </span>
-        <span className="navigation-links-text2 Navigation-Link">
+        <span
+          onClick={() => scrollToSection(3)}
+          className="navigation-links-text2 Navigation-Link"
+        >
           {props.link3}
         </span>
-        <span className="navigation-links-text3 Navigation-Link">
+        <span
+          onClick={() => scrollToSection(4)}
+          className="navigation-links-text3 Navigation-Link"
+        >
           {props.link4}
         </span>
       </nav>
@@ -86,16 +100,16 @@ const NavigationLinks = (props) => {
         `}
       </style>
     </>
-  )
-}
+  );
+};
 
 NavigationLinks.defaultProps = {
-  link3: 'Portofolio',
-  rootClassName: '',
-  link2: 'About',
-  link4: 'Blog',
-  link1: 'Home',
-}
+  link3: "Menu",
+  rootClassName: "",
+  link2: "About",
+  link4: "Contact Us",
+  link1: "Home",
+};
 
 NavigationLinks.propTypes = {
   link3: PropTypes.string,
@@ -103,6 +117,6 @@ NavigationLinks.propTypes = {
   link2: PropTypes.string,
   link4: PropTypes.string,
   link1: PropTypes.string,
-}
+};
 
-export default NavigationLinks
+export default NavigationLinks;

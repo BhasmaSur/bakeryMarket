@@ -1,47 +1,97 @@
-import React from 'react'
+"use client";
+import React, { useState } from "react";
 
-import PropTypes from 'prop-types'
+import PropTypes from "prop-types";
 
-import NavigationLinks from './navigation-links'
+import NavigationLinks from "./navigation-links";
+import Link from "next/link";
+import MobileMenu from "./mobile-menu";
 
 const Navigation = (props) => {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { openCartModal, scrollToSection, logo } = props;
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
+  };
+
+  const closeMenu = () => {
+    setIsMenuOpen(false);
+  };
+
+  const closeMenuAndScroll = (sectionNumber) => {
+    closeMenu();
+    scrollToSection(sectionNumber);
+  };
+
+  const closeMenuAndOpenCart = () =>{
+    closeMenu();
+    openCartModal();
+  }
+
   return (
     <>
       <header data-role="Header" className="navigation-header">
         <div className="navigation-max-width">
-          <img alt={props.imageAlt} src={props.imageSrc} />
+          <img
+            alt={logo.altImage}
+            src={logo.image_url}
+            width={40}
+            height={40}
+          />
           <div className="navigation-nav">
-            <NavigationLinks rootClassName="navigation-links-root-class-name17"></NavigationLinks>
-            <button className="button-secondary button button-md">
+            <NavigationLinks
+              scrollToSection={scrollToSection}
+              rootClassName="navigation-links-root-class-name17"
+            ></NavigationLinks>
+            <button
+              onClick={openCartModal}
+              className="button-secondary button button-md"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+                class="file: mt-4 h-6 w-6"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z"
+                />
+              </svg>
               {props.button}
             </button>
           </div>
-          <div data-role="BurgerMenu" className="navigation-burger-menu">
-            <svg viewBox="0 0 1024 1024" className="navigation-icon">
-              <path d="M128 554.667h768c23.552 0 42.667-19.115 42.667-42.667s-19.115-42.667-42.667-42.667h-768c-23.552 0-42.667 19.115-42.667 42.667s19.115 42.667 42.667 42.667zM128 298.667h768c23.552 0 42.667-19.115 42.667-42.667s-19.115-42.667-42.667-42.667h-768c-23.552 0-42.667 19.115-42.667 42.667s19.115 42.667 42.667 42.667zM128 810.667h768c23.552 0 42.667-19.115 42.667-42.667s-19.115-42.667-42.667-42.667h-768c-23.552 0-42.667 19.115-42.667 42.667s19.115 42.667 42.667 42.667z"></path>
+
+          <button
+            onClick={toggleMenu}
+            className="text-xl focus:outline-none lg:hidden"
+          >
+            <svg
+              className="h-6 w-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M4 6h16M4 12h16M4 18h16"
+              />
             </svg>
-          </div>
-          <div data-role="MobileMenu" className="mobile-menu">
-            <div className="navigation-nav1">
-              <div className="navigation-container">
-                <img alt={props.imageAlt1} src={props.imageSrc1} />
-                <div
-                  data-role="CloseMobileMenu"
-                  className="navigation-close-mobile-menu"
-                >
-                  <svg viewBox="0 0 1024 1024" className="navigation-icon2">
-                    <path d="M810 274l-238 238 238 238-60 60-238-238-238 238-60-60 238-238-238-238 60-60 238 238 238-238z"></path>
-                  </svg>
-                </div>
-              </div>
-              <NavigationLinks rootClassName="navigation-links-root-class-name18"></NavigationLinks>
-              <button className="button-secondary button button-md">
-                {props.button2}
-              </button>
-            </div>
-          </div>
+          </button>
         </div>
       </header>
+      <MobileMenu
+        isOpen={isMenuOpen}
+        onClose={closeMenu}
+        closeMenuAndScroll={closeMenuAndScroll}
+        closeMenuAndOpenCart = {closeMenuAndOpenCart}
+      />
       <style jsx>
         {`
           .navigation-header {
@@ -118,17 +168,17 @@ const Navigation = (props) => {
         `}
       </style>
     </>
-  )
-}
+  );
+};
 
 Navigation.defaultProps = {
-  imageSrc: '/logo1-1200w.png',
-  button: 'Get in touch',
-  imageAlt1: 'image',
-  imageSrc1: '/logo1-1200w.png',
-  button2: 'Get in touch',
-  imageAlt: 'logo',
-}
+  imageSrc: "/logo1-1200w.png",
+  button: "Cart",
+  imageAlt1: "image",
+  imageSrc1: "/logo1-1200w.png",
+  button2: "Get in touch",
+  imageAlt: "logo",
+};
 
 Navigation.propTypes = {
   imageSrc: PropTypes.string,
@@ -137,6 +187,6 @@ Navigation.propTypes = {
   imageSrc1: PropTypes.string,
   button2: PropTypes.string,
   imageAlt: PropTypes.string,
-}
+};
 
-export default Navigation
+export default Navigation;

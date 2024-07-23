@@ -1,37 +1,177 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import Head from "next/head";
-
 import Navigation from "@/app/components/navigation";
-import BlogCard from "@/app/components/blog-card";
-import PortofolioCard from "@/app/components/portofolio-card";
 import ServicesCard from "@/app/components/services-card";
 import httpService from "@/services/httpService";
 import { CONTROLLER, METHOD } from "@/constants/apiConstants";
+import ProductCard from "@/app/components/product-card";
+import Modal from "@/app/components/modal";
+import ItemModal from "@/app/components/item-modal";
+import CartModal from "@/app/components/cart-modal";
+import ContactModal from "@/app/components/contactus-modal";
 
 const Dashboard = ({ bakeryName }) => {
   const [bakeryDetail, setBakeryDetail] = useState(null);
+  const [categories, setCategories] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isCartModalOpen, setIsCartModalOpen] = useState(false);
+  const [isContactOpen, setIsContactModalOpen] = useState(false);
+  const [cartData, setCartData] = useState([]);
+  const [itemSelected, setItemSelected] = useState(null);
+  const homeSection = useRef(null);
+  const aboutSection = useRef(null);
+  const menuSection = useRef(null);
+  const contactSection = useRef(null);
+  const [selectedCategory, setSelectedCategory] = useState(null);
+  const menuDetail = useMemo(() => {
+    return bakeryDetail?.products.filter(
+      (product) => product.category === selectedCategory
+    );
+  }, [bakeryDetail, selectedCategory]);
   useEffect(() => {
     httpService(bakeryName, METHOD.GET, null, CONTROLLER.BAKERY).then(
       (bakery) => {
         if (bakery) {
-          console.log(bakery);
           setBakeryDetail(bakery.data);
+          const rawCategories = bakery.data.products.map(
+            (product) => product.category
+          );
+          const currentCategories = rawCategories.filter(
+            (item, i, ar) => ar.indexOf(item) === i
+          );
+          setCategories([...currentCategories]);
+          setSelectedCategory(currentCategories.at(0));
         }
       }
     );
   }, []);
+
+  const changeProductView = (ev) => {
+    setSelectedCategory(ev.target.outerText);
+  };
+
+  const addDataToCart = (addItem) => {
+    const cartVariant = cartData.filter(
+      (cartItem) =>
+        cartItem.productId === addItem.productId &&
+        cartItem.variantId === addItem.variantId
+    );
+    if (cartVariant.length > 0) {
+      let tempCartData = cartData.map((cartItem) => {
+        if (
+          cartItem.productId === addItem.productId &&
+          cartItem.variantId === addItem.variantId
+        ) {
+          return addItem;
+        }
+        return cartItem;
+      });
+      setCartData([...tempCartData]);
+    } else {
+      setCartData([...cartData, addItem]);
+    }
+  };
+
+  const openModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const selectItemToAdd = (currentItem) => {
+    setItemSelected({ ...currentItem });
+    openModal();
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
+
+  const openCartModal = () => {
+    setIsCartModalOpen(true);
+  };
+
+  const openContactModal = () => {
+    setIsContactModalOpen(true);
+  };
+
+  const closeCartModal = () => {
+    setIsCartModalOpen(false);
+  };
+
+  const closeContactModal = () => {
+    setIsContactModalOpen(false);
+  };
+
+  const scrollToSection = (num) => {
+    switch (num) {
+      case 1:
+        window.scrollTo({
+          top: homeSection.current.offsetTop,
+          behavior: "smooth",
+        });
+        break;
+      case 2:
+        window.scrollTo({
+          top: aboutSection.current.offsetTop - 120,
+          behavior: "smooth",
+        });
+        break;
+      case 3:
+        window.scrollTo({
+          top: menuSection.current.offsetTop - 120,
+          behavior: "smooth",
+        });
+        break;
+      case 4:
+        window.scrollTo({
+          top: contactSection.current.offsetTop - 120,
+          behavior: "smooth",
+        });
+        break;
+    }
+  };
   return (
     <>
+      {itemSelected && (
+        <Modal isOpen={isModalOpen} onClose={closeModal}>
+          <ItemModal
+            cartData={cartData}
+            itemSelected={itemSelected}
+            closeModal={closeModal}
+            addDataToCart={addDataToCart}
+          />
+        </Modal>
+      )}
+      {cartData.length > 0 && (
+        <Modal isOpen={isCartModalOpen} onClose={setIsCartModalOpen}>
+          <CartModal
+            cartData={cartData}
+            bakeryDetail={bakeryDetail}
+            closeModal={closeCartModal}
+          />
+        </Modal>
+      )}
+      {bakeryDetail && (
+        <Modal isOpen={isContactOpen} onClose={setIsContactModalOpen}>
+          <ContactModal
+            shopName={bakeryDetail.name}
+            closeModal={closeContactModal}
+          />
+        </Modal>
+      )}
       {bakeryDetail && (
         <>
           {" "}
-          <div className="home-container">
+          <div ref={homeSection} className="home-container">
             <Head>
               <title>{bakeryDetail.name}</title>
-              <meta property="og:title" content="Creative Agency Page" />
+              <meta property="og:title" content="Food Agency Shops" />
             </Head>
-            <Navigation></Navigation>
+            <Navigation
+              openCartModal={openCartModal}
+              scrollToSection={scrollToSection}
+              logo={bakeryDetail.logo}
+            ></Navigation>
             <main className="home-main">
               <div className="home-hero section-container">
                 <div className="home-max-width max-content-container">
@@ -45,7 +185,10 @@ const Dashboard = ({ bakeryName }) => {
                       <span>{bakeryDetail.heading.h3}</span>
                       <br></br>
                     </span>
-                    <button className="home-primary button-primary button-lg button">
+                    <button
+                      onClick={openContactModal}
+                      className="home-primary button-primary button-lg button"
+                    >
                       Get in touch with us
                     </button>
                   </div>
@@ -147,7 +290,7 @@ const Dashboard = ({ bakeryName }) => {
                   </div>
                 </div>
               </div>
-              <div className="section-container">
+              <div ref={menuSection} className="section-container">
                 <div className="home-max-width2 max-content-container">
                   <div className="home-text-container1">
                     <span className="home-text12">our menu</span>
@@ -174,58 +317,33 @@ const Dashboard = ({ bakeryName }) => {
                       See all projects
                     </button> */}
                   </div>
-                  <div className="home-tab-selector-header">
-                    <span className="home-text19 tab-selector-btn">
-                      Advertising
-                    </span>
-                    <span className="home-text20 tab-selector-btn">
-                      Social Media
-                    </span>
-                    <span className="home-text21 tab-selector-btn">
-                      Branding
-                    </span>
-                    <span className="home-text22 tab-selector-btn">
-                      UI / UX
-                    </span>
-                    <span className="home-text23 tab-selector-btn">
-                      Packaging
-                    </span>
-                    <span className="tab-selector-btn">Product Design</span>
-                  </div>
+                  {categories && (
+                    <div className="home-tab-selector-header">
+                      {categories.map((cate) => {
+                        return (
+                          <span
+                            onClick={(e) => changeProductView(e)}
+                            className="home-text19 tab-selector-btn"
+                          >
+                            {cate}
+                          </span>
+                        );
+                      })}
+                    </div>
+                  )}
                   <div className="home-tab-selector-cards-container">
-                    <PortofolioCard
-                      imageSrc="/unsplash_qj15unotnh0-400h.png"
-                      rootClassName="portofolio-card-root-class-name"
-                    ></PortofolioCard>
-                    <PortofolioCard
-                      imageSrc="/unsplash_wwqrpsnbpq4-400h.png"
-                      projectTitle="A brand-new advertising idea"
-                      rootClassName="portofolio-card-root-class-name5"
-                    ></PortofolioCard>
-                    <PortofolioCard
-                      imageSrc="https://images.unsplash.com/photo-1622483767028-3f66f32aef97?ixid=Mnw5MTMyMXwwfDF8c2VhcmNofDEzfHxjb2NhJTIwY29sYXxlbnwwfHx8fDE2NDY5MjYyNTM&amp;ixlib=rb-1.2.1&amp;h=400"
-                      projectTitle="Coca-Cola Summer Concept Campaign - 2021"
-                      rootClassName="portofolio-card-root-class-name4"
-                    ></PortofolioCard>
-                    <PortofolioCard
-                      imageSrc="https://images.unsplash.com/photo-1519420573924-65fcd45245f8?ixid=Mnw5MTMyMXwwfDF8c2VhcmNofDJ8fG51dGVsbGF8ZW58MHx8fHwxNjQ2OTI2MTky&amp;ixlib=rb-1.2.1&amp;h=400"
-                      projectTitle="Ad Campaign - I love you as much as I love Nutella"
-                      rootClassName="portofolio-card-root-class-name3"
-                    ></PortofolioCard>
-                    <PortofolioCard
-                      imageSrc="https://images.unsplash.com/photo-1567103472667-6898f3a79cf2?ixid=Mnw5MTMyMXwwfDF8c2VhcmNofDd8fGNvY2ElMjBjb2xhfGVufDB8fHx8MTY0NjkyNjI1Mw&amp;ixlib=rb-1.2.1&amp;h=400"
-                      projectTitle="Coca-Colla Next Door Campaign - conceptual"
-                      rootClassName="portofolio-card-root-class-name2"
-                    ></PortofolioCard>
-                    <PortofolioCard
-                      imageSrc="https://images.unsplash.com/photo-1545231027-637d2f6210f8?ixid=Mnw5MTMyMXwwfDF8c2VhcmNofDF8fHN0YXJidWNrc3xlbnwwfHx8fDE2NDY5MjYyMzc&amp;ixlib=rb-1.2.1&amp;h=400"
-                      projectTitle="Starbucks secret is a smile when you get your latte"
-                      rootClassName="portofolio-card-root-class-name1"
-                    ></PortofolioCard>
+                    {menuDetail.map((menuItem) => {
+                      return (
+                        <ProductCard
+                          menuItem={menuItem}
+                          openModal={selectItemToAdd}
+                        />
+                      );
+                    })}
                   </div>
                 </div>
               </div>
-              <div className="home-about section-container">
+              <div ref={aboutSection} className="home-about section-container">
                 <div className="home-max-width3 max-content-container">
                   <div className="home-text-container2">
                     <span className="home-text25">about us</span>
@@ -244,17 +362,18 @@ const Dashboard = ({ bakeryName }) => {
                       {bakeryDetail.about_us.para}
                     </span>
                     <div className="home-checklist">
-                      {bakeryDetail.about_us.para_points.map((bakeryPoint)=>{
+                      {bakeryDetail.about_us.para_points.map((bakeryPoint) => {
                         return (
                           <div className="home-check-item">
-                          <svg viewBox="0 0 1024 1024" className="home-icon04">
-                            <path d="M384 690l452-452 60 60-512 512-238-238 60-60z"></path>
-                          </svg>
-                          <span className="home-text31">
-                            {bakeryPoint}
-                          </span>
-                        </div>
-                        )
+                            <svg
+                              viewBox="0 0 1024 1024"
+                              className="home-icon04"
+                            >
+                              <path d="M384 690l452-452 60 60-512 512-238-238 60-60z"></path>
+                            </svg>
+                            <span className="home-text31">{bakeryPoint}</span>
+                          </div>
+                        );
                       })}
                     </div>
                   </div>
@@ -269,7 +388,7 @@ const Dashboard = ({ bakeryName }) => {
                   </div>
                 </div>
               </div>
-              <div className="home-process section-container">
+              {/* <div className="home-process section-container">
                 <div className="home-max-width4 max-content-container">
                   <span className="home-text37">Our process</span>
                   <h2 className="home-text38 Heading2">
@@ -335,8 +454,8 @@ const Dashboard = ({ bakeryName }) => {
                     </div>
                   </div>
                 </div>
-              </div>
-              <div className="section-container">
+              </div> */}
+              {/* <div className="section-container">
                 <div className="home-max-width5 max-content-container">
                   <span className="home-text51">from blog</span>
                   <h2 className="home-text52 Heading2">
@@ -376,8 +495,11 @@ const Dashboard = ({ bakeryName }) => {
                     ></BlogCard>
                   </div>
                 </div>
-              </div>
-              <div className="home-banner section-container">
+              </div> */}
+              <div
+                ref={contactSection}
+                className="home-banner section-container"
+              >
                 <div className="home-max-width6 max-content-container">
                   <span className="home-text58">what are you waiting?</span>
                   <h2 className="home-text59 Heading2">
@@ -385,8 +507,8 @@ const Dashboard = ({ bakeryName }) => {
                   </h2>
                   <span className="home-text61">
                     <span>
-                      Lorem ipsum dolor sit amet, consectetur adipiscing elit,
-                      sed do eiusmod tempor incididunt
+                      For clients seeking sweet collaborations, where dreams are
+                      baked with delight,
                       <span
                         dangerouslySetInnerHTML={{
                           __html: " ",
@@ -395,17 +517,20 @@ const Dashboard = ({ bakeryName }) => {
                     </span>
                     <br></br>
                     <span>
-                      ut labore et dolore magna aliqua. Ut enim ad minim veniam,
-                      quis nostrud exercitation.
+                      Join hands with us, where every confection tells a tale,
+                      pure and bright.
                     </span>
                   </span>
-                  <button className="home-primary3 button-lg button-secondary-white button">
+                  <button
+                    onClick={openContactModal}
+                    className="home-primary3 button-lg button-secondary-white button"
+                  >
                     Contact us
                   </button>
                 </div>
               </div>
             </main>
-            <div className="section-container">
+            {/* <div className="section-container">
               <div className="max-content-container">
                 <div className="home-top-part">
                   <div className="home-links-container">
@@ -503,7 +628,7 @@ const Dashboard = ({ bakeryName }) => {
                   </span>
                 </span>
               </footer>
-            </div>
+            </div> */}
           </div>
           <style jsx>
             {`

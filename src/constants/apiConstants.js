@@ -2,6 +2,7 @@ export const METHOD = {
   GET: "get",
   POST: "post",
   DELETE: "delete",
+  PUT: "put"
 };
 
 export const OPERATION = {
@@ -13,4 +14,8 @@ export const OPERATION = {
 export const CONTROLLER = {
   USER : "user",
   BAKERY : "bakery",
+}
+
+export const BAKERY_OPERATION = {
+  UPDATE_PRODUCTS : "UPDATE_PRODUCTS"
 }
