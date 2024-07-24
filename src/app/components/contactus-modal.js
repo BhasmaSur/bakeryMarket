@@ -17,10 +17,10 @@ const ContactModal = ({ closeModal, shopName }) => {
       };
       sendEmail(emailPayload).then((emailRes) => {
         if (emailRes) {
-          alert("Your Message is send to the admin, we will contact you soon");
+          alert("Your Message is sent to the admin, we will contact you soon");
+          closeModal();
         }
       });
-      closeModal();
     } else {
       alert("Please fill contact details");
     }
