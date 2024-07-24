@@ -12,7 +12,7 @@ const ContactModal = ({ closeModal, shopName }) => {
       const emailPayload = {
         shop_name: shopName,
         message: message,
-        from_name: username,
+        from_name: username + `\nContact Detail : ${contactDetail}\n\n`,
         reply_to: contactDetail,
       };
       sendEmail(emailPayload).then((emailRes) => {

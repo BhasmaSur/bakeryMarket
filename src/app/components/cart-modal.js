@@ -44,7 +44,8 @@ const CartModal = ({
 
   const mailToShop = () => {
     if (username && contactDetail) {
-      let orderInfo = `Order Placed By : ${username}\n\n\n`;
+      let orderInfo = `Order Placed By : ${username}\n`;
+      let orderContactdetail = `Conatact Detail : ${contactDetail}\n\n`
       let orderDetails = "Order Details : \n\n\n";
       filteredCartData.forEach((cartItem) => {
         const order = `Product Id : ${cartItem.id}\n
@@ -59,6 +60,7 @@ const CartModal = ({
 
       orderInfo =
         orderInfo +
+        orderContactdetail +
         orderDetails +
         "Grand Total : " +
         calculateTotal +
